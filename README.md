@@ -151,14 +151,18 @@ flowchart LR
 
 ## Model & Training
 
-WildGuard uses RT-DETR as its primary object detection model. The model was fine-tuned from a COCO-pretrained RT-DETR checkpoint using the prepared wildlife detection dataset.
+## 6. Model & Training
 
-Training was performed using a reproducible configuration with a fixed seed and deterministic training enabled. The model was trained at 640×640 image resolution with a batch size of 8 and automatic mixed precision enabled.
+WildGuard uses **RT-DETR** as its primary object detection model. The RT-DETR architecture was trained for the project-specific **12-class wildlife detection task**.
+
+The dataset was divided into **70% training, 15% validation, and 15% test data**. The training split was used for model learning, the validation split was used to monitor performance during training, and the test split was kept separate for final evaluation.
+
+Training was performed at **640 × 640** image resolution with a batch size of **8**. Automatic mixed precision (AMP) was enabled, with a fixed seed and deterministic training configuration for reproducibility.
 
 | Configuration | Value |
 |---|---|
 | Architecture | RT-DETR |
-| Initialization | COCO-pretrained checkpoint |
+| Dataset Split | 70% Train / 15% Validation / 15% Test |
 | Image Size | 640 × 640 |
 | Batch Size | 8 |
 | Configured Maximum Epochs | 50 |
@@ -173,7 +177,13 @@ Training was performed using a reproducible configuration with a fixed seed and 
 | Deterministic Training | Enabled |
 | Dataset Classes | 12 |
 
-The training process was followed by validation-based evaluation. After identifying class-specific confusion during evaluation, additional lion images were incorporated and the model was further fine-tuned. The final reported metrics correspond to the resulting 39-epoch training run.
+### Targeted Class-Specific Fine-Tuning
+
+During the initial evaluation, the model showed noticeable confusion involving a particular class (**lion**). To investigate whether targeted data expansion could address this issue, additional samples for the affected class were introduced and the model was further fine-tuned.
+
+The initial training phase ran for **29 epochs**. Following the evaluation, the additional samples were incorporated and training was continued for another **10 epochs**, resulting in **39 executed epochs** in total.
+
+The additional fine-tuning did not produce the expected improvement in overall detection performance. This highlighted that increasing the number of samples alone does not necessarily resolve class confusion and that **sample diversity, visual representation, and class separability** are important factors in object detection.
 
 The trained `best.pt` checkpoint is retained as the deployable model weight and is distributed using Git LFS.
 
@@ -195,6 +205,7 @@ The evaluation results indicate that the model provides a good balance between d
 The training and validation curves, along with the final evaluation outputs, are included below.
 
 <!-- Add your training/evaluation plot screenshot here -->
+![WildGuard Training Results](assets/evaluation/training_results.png)
 
 ## Failure Analysis
 
