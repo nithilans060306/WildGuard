@@ -76,9 +76,6 @@ flowchart LR
 
 ## Detection Pipeline
 
-```md
-## Detection Pipeline
-
 The detection pipeline accepts an image and processes it through the fine-tuned RT-DETR model to identify wildlife objects. For every detected object, the system extracts the predicted class, confidence score, and bounding-box coordinates.
 
 Human detection is performed independently using the auxiliary MediaPipe EfficientDet-Lite0 detector. The resulting human detections are combined with the RT-DETR predictions to form a structured representation of the complete scene. This structured output is then used by the visual reasoning layer rather than relying on free-form visual interpretation.
@@ -201,22 +198,6 @@ The training and validation curves, along with the final evaluation outputs, are
 
 ## Failure Analysis
 
-WildGuard was evaluated not only on successful detections but also on difficult scenes where the model produced incorrect, incomplete, or low-confidence predictions. These failure cases were used to understand the practical limitations of the detector and to identify areas where additional data or model improvements could be beneficial.
-
-The major failure patterns observed include:
-
-| Failure Case | Observed Issue | Root Cause |
-|---|---|---|
-| 1. Heavy Occlusion | Animal partially missed or poorly localized | Vegetation or other objects hide significant portions of the animal |
-| 2. Low-Light / Night Scene | Reduced confidence or missed detection | Limited visual information and infrared/night-time appearance |
-| 3. Similar Species | Incorrect class prediction | Similar visual characteristics between related wildlife classes |
-| 4. Small / Distant Animal | Weak localization or missed detection | Object occupies only a small portion of the image |
-| 5. Complex Background | False or unstable predictions | Animal appearance overlaps with vegetation and environmental textures |
-
-These cases demonstrate that high aggregate detection metrics do not eliminate difficult edge cases. The targeted addition of lion samples during training is one example of an iterative improvement based directly on observed model confusion.
-
-## Failure Analysis
-
 WildGuard was evaluated on challenging visual conditions to identify cases where detection performance can degrade. The observed failure patterns were analyzed to understand their likely causes and guide future improvements.
 
 | Failure Case | Observed Issue | Root Cause |
@@ -278,7 +259,7 @@ The current interaction logic is based on same-frame co-occurrence rather than p
 | Required evidence unavailable | Insufficient information |
 
 The auxiliary human detector is used specifically for human-presence detection and is separate from the fine-tuned WildGuard RT-DETR model.
-```
+
 
 ## API
 
