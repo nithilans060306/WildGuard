@@ -1,0 +1,21 @@
+path: C:\WildGuard\dataset
+
+train: train/images
+val: val/images
+test: test/images
+
+nc: 12
+
+names:
+  0: elephant
+  1: jaguar
+  2: hyena
+  3: buffalo
+  4: baboon
+  5: leopard
+  6: tiger
+  7: lion
+  8: chimp
+  9: golden_cat
+  10: clouded_leopard
+  11: vehicle

@@ -1,0 +1,12 @@
+elephant
+jaguar
+hyena
+buffalo
+baboon
+leopard
+tiger
+lion
+chimp
+golden_cat
+clouded_leopard
+vehicle

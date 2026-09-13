@@ -1,0 +1,478 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>WildGuard</title>
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;600;700&display=swap" rel="stylesheet"/>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg: #0d1117;
+      --surface: #161b22;
+      --border: #30363d;
+      --accent: #3fb950;
+      --accent-dim: #1a4d2e;
+      --text: #e6edf3;
+      --muted: #8b949e;
+      --danger: #f85149;
+      --user-bubble: #1f6feb;
+      --bot-bubble: #21262d;
+    }
+
+    body {
+      font-family: 'Space Grotesk', sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      min-height: 100vh;
+    }
+
+    /* ── PAGE 1: UPLOAD ── */
+    #page-upload {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      min-height: 100vh;
+      gap: 2rem;
+      padding: 2rem;
+    }
+
+    #page-upload h1 {
+      font-size: 3rem;
+      font-weight: 700;
+      letter-spacing: -0.03em;
+      text-align: center;
+    }
+
+    #page-upload h1 span {
+      color: var(--accent);
+    }
+
+    #page-upload p {
+      color: var(--muted);
+      font-size: 1rem;
+      text-align: center;
+    }
+
+    #drop-zone {
+      width: 400px;
+      height: 280px;
+      border: 2px dashed var(--border);
+      border-radius: 16px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 1rem;
+      cursor: pointer;
+      transition: border-color 0.2s, background 0.2s;
+      position: relative;
+      overflow: hidden;
+    }
+
+    #drop-zone:hover {
+      border-color: var(--accent);
+      background: rgba(63, 185, 80, 0.04);
+    }
+
+    #drop-zone img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      position: absolute;
+      top: 0; left: 0;
+      border-radius: 14px;
+    }
+
+    #drop-zone input {
+      position: absolute;
+      inset: 0;
+      opacity: 0;
+      cursor: pointer;
+    }
+
+    #drop-icon {
+      font-size: 2.5rem;
+    }
+
+    #drop-label {
+      color: var(--muted);
+      font-size: 0.9rem;
+      text-align: center;
+      padding: 0 1rem;
+    }
+
+    #btn-predict {
+      padding: 0.85rem 3rem;
+      background: var(--accent);
+      color: #0d1117;
+      font-family: inherit;
+      font-size: 1rem;
+      font-weight: 700;
+      border: none;
+      border-radius: 10px;
+      cursor: pointer;
+      transition: opacity 0.2s, transform 0.1s;
+    }
+
+    #btn-predict:hover { opacity: 0.85; }
+    #btn-predict:active { transform: scale(0.97); }
+    #btn-predict:disabled { opacity: 0.4; cursor: not-allowed; }
+
+    /* ── PAGE 2: RESULTS + CHAT ── */
+    #page-result {
+      display: none;
+      flex-direction: column;
+      align-items: center;
+      padding: 2rem 1rem 6rem;
+      gap: 2rem;
+      min-height: 100vh;
+    }
+
+    #result-header {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+      width: 100%;
+      max-width: 800px;
+    }
+
+    #btn-back {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      color: var(--text);
+      font-family: inherit;
+      font-size: 0.85rem;
+      padding: 0.5rem 1rem;
+      border-radius: 8px;
+      cursor: pointer;
+    }
+
+    #result-header h2 {
+      font-size: 1.4rem;
+      font-weight: 700;
+    }
+
+    #result-header h2 span { color: var(--accent); }
+
+    #annotated-img {
+      width: 100%;
+      max-width: 700px;
+      border-radius: 14px;
+      border: 1px solid var(--border);
+      object-fit: contain;
+    }
+
+    #detection-summary {
+      width: 100%;
+      max-width: 700px;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 1rem 1.25rem;
+      font-size: 0.9rem;
+      color: var(--muted);
+      line-height: 1.6;
+    }
+
+    #detection-summary strong { color: var(--text); }
+
+    /* ── CHAT ── */
+    #chat-container {
+      width: 100%;
+      max-width: 700px;
+      display: flex;
+      flex-direction: column;
+      gap: 0.75rem;
+    }
+
+    #chat-container h3 {
+      font-size: 1rem;
+      font-weight: 600;
+      color: var(--muted);
+      border-bottom: 1px solid var(--border);
+      padding-bottom: 0.5rem;
+    }
+
+    #chat-history {
+      display: flex;
+      flex-direction: column;
+      gap: 0.75rem;
+      max-height: 400px;
+      overflow-y: auto;
+      padding-right: 0.25rem;
+    }
+
+    .bubble {
+      max-width: 85%;
+      padding: 0.75rem 1rem;
+      border-radius: 12px;
+      font-size: 0.92rem;
+      line-height: 1.5;
+    }
+
+    .bubble.user {
+      background: var(--user-bubble);
+      align-self: flex-end;
+      border-bottom-right-radius: 4px;
+    }
+
+    .bubble.bot {
+      background: var(--bot-bubble);
+      border: 1px solid var(--border);
+      align-self: flex-start;
+      border-bottom-left-radius: 4px;
+    }
+
+    .bubble.bot.alert-msg {
+      border-color: var(--danger);
+      color: var(--danger);
+    }
+
+    .bubble.bot.guardrail {
+      color: var(--muted);
+      font-style: italic;
+    }
+
+    #chat-input-row {
+      display: flex;
+      gap: 0.5rem;
+      margin-top: 0.5rem;
+    }
+
+    #chat-input {
+      flex: 1;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      color: var(--text);
+      font-family: inherit;
+      font-size: 0.92rem;
+      padding: 0.75rem 1rem;
+      border-radius: 10px;
+      outline: none;
+      transition: border-color 0.2s;
+    }
+
+    #chat-input:focus { border-color: var(--accent); }
+
+    #btn-send {
+      background: var(--accent);
+      color: #0d1117;
+      font-family: inherit;
+      font-weight: 700;
+      font-size: 0.92rem;
+      padding: 0.75rem 1.25rem;
+      border: none;
+      border-radius: 10px;
+      cursor: pointer;
+      transition: opacity 0.2s;
+    }
+
+    #btn-send:hover { opacity: 0.85; }
+    #btn-send:disabled { opacity: 0.4; cursor: not-allowed; }
+
+    /* loading dot */
+    .loading-dot {
+      display: inline-block;
+      animation: blink 1s step-start infinite;
+    }
+    @keyframes blink { 50% { opacity: 0; } }
+
+    ::-webkit-scrollbar { width: 4px; }
+    ::-webkit-scrollbar-track { background: transparent; }
+    ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 4px; }
+  </style>
+</head>
+<body>
+
+<!-- PAGE 1 -->
+<div id="page-upload">
+  <h1>Wild<span>Guard</span></h1>
+  <p>Wildlife intrusion & threat detection for reserve boundary monitoring</p>
+
+  <div id="drop-zone">
+    <input type="file" id="file-input" accept="image/*" />
+    <div id="drop-icon">🌿</div>
+    <div id="drop-label">Drop an image here<br/>or click to browse</div>
+  </div>
+
+  <button id="btn-predict" disabled>Predict</button>
+</div>
+
+<!-- PAGE 2 -->
+<div id="page-result">
+  <div id="result-header">
+    <button id="btn-back">← Back</button>
+    <h2>Wild<span>Guard</span> — Detection Results</h2>
+  </div>
+
+  <img id="annotated-img" src="" alt="Annotated Result" />
+
+  <div id="detection-summary" id="detection-summary">
+    Loading detections...
+  </div>
+
+  <div id="chat-container">
+    <h3>Ask about this image</h3>
+    <div id="chat-history"></div>
+    <div id="chat-input-row">
+      <input id="chat-input" type="text" placeholder="e.g. Is there a dangerous animal here?" />
+      <button id="btn-send">Send</button>
+    </div>
+  </div>
+</div>
+
+<script>
+  const fileInput = document.getElementById('file-input');
+  const dropZone = document.getElementById('drop-zone');
+  const btnPredict = document.getElementById('btn-predict');
+  const pageUpload = document.getElementById('page-upload');
+  const pageResult = document.getElementById('page-result');
+  const annotatedImg = document.getElementById('annotated-img');
+  const detectionSummary = document.getElementById('detection-summary');
+  const chatHistory = document.getElementById('chat-history');
+  const chatInput = document.getElementById('chat-input');
+  const btnSend = document.getElementById('btn-send');
+  const btnBack = document.getElementById('btn-back');
+
+  let currentFile = null;
+  let currentDetections = [];
+
+  // File selection
+  fileInput.addEventListener('change', () => {
+    const file = fileInput.files[0];
+    if (!file) return;
+    currentFile = file;
+    const url = URL.createObjectURL(file);
+    dropZone.querySelector('#drop-icon').style.display = 'none';
+    dropZone.querySelector('#drop-label').style.display = 'none';
+    let img = dropZone.querySelector('img');
+    if (!img) { img = document.createElement('img'); dropZone.appendChild(img); }
+    img.src = url;
+    btnPredict.disabled = false;
+  });
+
+  // Predict
+  btnPredict.addEventListener('click', async () => {
+    if (!currentFile) return;
+    btnPredict.disabled = true;
+    btnPredict.textContent = 'Detecting...';
+
+    const formData = new FormData();
+    formData.append('file', currentFile);
+
+    try {
+      // Get visual
+      const visualRes = await fetch('/detect/visual', { method: 'POST', body: formData });
+      const blob = await visualRes.blob();
+      annotatedImg.src = URL.createObjectURL(blob);
+
+      // Get JSON
+      const formData2 = new FormData();
+      formData2.append('file', currentFile);
+      const jsonRes = await fetch('/detect/json', { method: 'POST', body: formData2 });
+      const data = await jsonRes.json();
+      currentDetections = data.detections;
+
+      // Build summary
+      if (data.total_detections === 0) {
+        detectionSummary.innerHTML = '<strong>No detections</strong> — no animals or vehicles found with sufficient confidence.';
+      } else {
+        const counts = {};
+        data.detections.forEach(d => {
+          counts[d.class] = (counts[d.class] || 0) + 1;
+        });
+        const summary = Object.entries(counts).map(([k, v]) => `<strong>${v} ${k}</strong>`).join(', ');
+        detectionSummary.innerHTML = `Detected: ${summary} &nbsp;·&nbsp; Total: <strong>${data.total_detections}</strong>`;
+      }
+
+      // Show alert banner if human + dangerous animal
+      const classes = data.detections.map(d => d.class);
+      const dangerous = ['lion','tiger','leopard','jaguar','elephant','hyena','baboon','buffalo','chimp'];
+      const hasDangerous = classes.some(c => dangerous.includes(c));
+      const hasHuman = classes.includes('human');
+
+      if (hasDangerous && hasHuman) {
+        const banner = document.getElementById('alert-banner');
+        if (banner) {
+          banner.style.display = 'block';
+          banner.innerHTML = '🔴 RESCUE ALERT — Dangerous wildlife detected near a human. Immediate action required.';
+        }
+      } else {
+        const banner = document.getElementById('alert-banner');
+        if (banner) banner.style.display = 'none';
+      }
+
+      // Switch page
+      pageUpload.style.display = 'none';
+      pageResult.style.display = 'flex';
+
+    } catch (err) {
+      alert('Detection failed. Make sure the API is running.');
+      btnPredict.disabled = false;
+      btnPredict.textContent = 'Predict';
+    }
+  });
+
+  // Back
+  btnBack.addEventListener('click', () => {
+    pageUpload.style.display = 'flex';
+    pageResult.style.display = 'none';
+    chatHistory.innerHTML = '';
+    btnPredict.disabled = false;
+    btnPredict.textContent = 'Predict';
+    const banner = document.getElementById('alert-banner');
+    if (banner) banner.style.display = 'none';
+  });
+
+  // Chat
+  async function sendMessage() {
+    const question = chatInput.value.trim();
+    if (!question || !currentFile) return;
+
+    chatInput.value = '';
+    btnSend.disabled = true;
+
+    addBubble(question, 'user');
+    const loadingBubble = addBubble('Thinking <span class="loading-dot">●</span>', 'bot');
+
+    const formData = new FormData();
+    formData.append('file', currentFile);
+    formData.append('question', question);
+
+    try {
+      const res = await fetch('/analyze/', { method: 'POST', body: formData });
+      const data = await res.json();
+
+      loadingBubble.remove();
+
+      const isRescue = data.alert_level === 'RESCUE';
+      const isGuardrail = !data.detection_used;
+      const cls = isRescue ? 'alert-msg' : isGuardrail ? 'guardrail' : '';
+      addBubble(data.answer, 'bot', cls);
+
+    } catch (err) {
+      loadingBubble.remove();
+      addBubble('Something went wrong. Please try again.', 'bot');
+    }
+
+    btnSend.disabled = false;
+    chatInput.focus();
+  }
+
+  function addBubble(text, role, extraClass = '') {
+    const div = document.createElement('div');
+    div.className = `bubble ${role} ${extraClass}`;
+    div.innerHTML = text;
+    chatHistory.appendChild(div);
+    chatHistory.scrollTop = chatHistory.scrollHeight;
+    return div;
+  }
+
+  btnSend.addEventListener('click', sendMessage);
+  chatInput.addEventListener('keydown', e => { if (e.key === 'Enter') sendMessage(); });
+</script>
+</body>
+</html>
