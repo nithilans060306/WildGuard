@@ -151,8 +151,6 @@ flowchart LR
 
 ## Model & Training
 
-## 6. Model & Training
-
 WildGuard uses **RT-DETR** as its primary object detection model. The RT-DETR architecture was trained for the project-specific **12-class wildlife detection task**.
 
 The dataset was divided into **70% training, 15% validation, and 15% test data**. The training split was used for model learning, the validation split was used to monitor performance during training, and the test split was kept separate for final evaluation.
