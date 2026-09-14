@@ -39,6 +39,22 @@ The system is designed to be evidence-aware: when the available detections do no
 
 The complete application is exposed through FastAPI and can be deployed as a GPU-enabled Docker container.
 
+## RT-DETR Model Architecture
+
+WildGuard uses **RT-DETR (Real-Time DEtection TRansformer)** as its primary object detector. The architecture consists of a backbone, an Efficient Hybrid Encoder, IoU-aware Query Selection, and a Transformer Decoder & Head, providing an end-to-end detection pipeline.
+
+The backbone extracts multi-scale features from the input image, while the hybrid encoder processes these features through AIFI and CCFM before passing selected high-quality features to the decoder. :contentReference[oaicite:1]{index=1}
+
+## RT-DETR Model Architecture
+
+WildGuard uses **RT-DETR (Real-Time DEtection TRansformer)** as its primary object detector. The architecture consists of a backbone, an Efficient Hybrid Encoder, IoU-aware Query Selection, and a Transformer Decoder & Head, providing an end-to-end detection pipeline.
+
+The backbone extracts multi-scale features from the input image, while the hybrid encoder processes these features through AIFI and CCFM before passing selected high-quality features to the decoder. :contentReference[oaicite:1]{index=1}
+
+![RT-DETR Model Architecture](assets/architecture/rtdetr_architecture.png)
+
+The **Backbone** extracts feature maps from three stages, **S3, S4, and S5**, which provide information at different scales. The **AIFI (Attention-based Intra-scale Feature Interaction)** processes the high-level S5 features to capture richer semantic information. The **CCFM (CNN-based Cross-scale Feature-fusion Module)** combines information across feature scales. **IoU-aware Query Selection** selects suitable image features as initial object queries for the Transformer decoder. Finally, the **Decoder & Head** refines these queries and generates the predicted bounding boxes and confidence scores for the detected classes. :contentReference[oaicite:2]{index=2}
+
 ## System Architecture
 
 WildGuard is organized as a modular inference pipeline in which the FastAPI application acts as the entry point for both direct detection and natural-language visual reasoning.
