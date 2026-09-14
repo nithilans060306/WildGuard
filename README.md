@@ -43,12 +43,6 @@ The complete application is exposed through FastAPI and can be deployed as a GPU
 
 WildGuard uses **RT-DETR (Real-Time DEtection TRansformer)** as its primary object detector. The architecture consists of a backbone, an Efficient Hybrid Encoder, IoU-aware Query Selection, and a Transformer Decoder & Head, providing an end-to-end detection pipeline.
 
-The backbone extracts multi-scale features from the input image, while the hybrid encoder processes these features through AIFI and CCFM before passing selected high-quality features to the decoder. :contentReference[oaicite:1]{index=1}
-
-## RT-DETR Model Architecture
-
-WildGuard uses **RT-DETR (Real-Time DEtection TRansformer)** as its primary object detector. The architecture consists of a backbone, an Efficient Hybrid Encoder, IoU-aware Query Selection, and a Transformer Decoder & Head, providing an end-to-end detection pipeline.
-
 The backbone extracts multi-scale features from the input image, while the hybrid encoder processes these features through AIFI and CCFM before passing selected high-quality features to the decoder.
 
 ![RT-DETR Model Architecture](assets/architecture/rtdetr_architecture.png)
